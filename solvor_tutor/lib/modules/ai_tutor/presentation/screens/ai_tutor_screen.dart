@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../ai/edge/intent_classifier.dart';
+import '../../../../ai/ocr/ocr_service.dart';
 import '../../../../ai/search/offline_search.dart';
 import '../ai_tutor_provider.dart';
 
@@ -14,7 +18,10 @@ class AiTutorScreen extends ConsumerStatefulWidget {
 
 class _AiTutorScreenState extends ConsumerState<AiTutorScreen> {
   final _controller = TextEditingController();
+  final _ocrService = OcrService();
+  final _picker = ImagePicker();
   String _query = '';
+  bool _ocrProcessing = false;
 
   void _submit() {
     final q = _controller.text.trim();
@@ -22,9 +29,27 @@ class _AiTutorScreenState extends ConsumerState<AiTutorScreen> {
     setState(() => _query = q);
   }
 
+  Future<void> _captureAndOcr() async {
+    setState(() => _ocrProcessing = true);
+    try {
+      final xFile = await _picker.pickImage(source: ImageSource.camera);
+      if (xFile == null) return;
+
+      final file = File(xFile.path);
+      final text = await _ocrService.extractText(file);
+      if (text.trim().isNotEmpty) {
+        _controller.text = text.trim();
+        _submit();
+      }
+    } finally {
+      if (mounted) setState(() => _ocrProcessing = false);
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
+    _ocrService.dispose();
     super.dispose();
   }
 
@@ -42,6 +67,19 @@ class _AiTutorScreenState extends ConsumerState<AiTutorScreen> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: 'Ask anything about your exam...',
+                prefixIcon: _ocrProcessing
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.camera_alt),
+                        onPressed: _captureAndOcr,
+                      ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: _submit,

@@ -9,6 +9,7 @@ const questionsRoutes = require('./src/routes/questions');
 const taxonomyRoutes = require('./src/routes/taxonomy');
 const syncRoutes = require('./src/routes/sync');
 const scheduleRoutes = require('./src/routes/schedule');
+const adminRoutes = require('./src/routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,7 @@ app.use('/questions', questionsRoutes);
 app.use('/taxonomy', taxonomyRoutes);
 app.use('/sync', syncRoutes);
 app.use('/schedule', scheduleRoutes);
+app.use('/admin', adminRoutes);
 
 app.use(errorHandler);
 
