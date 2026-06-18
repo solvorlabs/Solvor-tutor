@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../modules/home/presentation/home_screen.dart';
+import '../../modules/onboarding/presentation/onboarding_screen.dart';
+import '../auth/auth_state.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-class AppRouter {
-  AppRouter._();
+final routerProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authStateProvider);
 
-  static final GoRouter router = GoRouter(
+  return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
+    initialLocation: '/onboarding',
+    redirect: (context, state) {
+      if (authState.isLoading) return null;
+
+      final isOnOnboarding = state.matchedLocation == '/onboarding';
+
+      if (authState.isLoggedIn && isOnOnboarding) return '/home';
+      if (!authState.isLoggedIn && !isOnOnboarding) return '/onboarding';
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Onboarding Screen')),
-        ),
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/home',
@@ -67,4 +77,4 @@ class AppRouter {
       ),
     ],
   );
-}
+});
