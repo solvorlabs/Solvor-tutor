@@ -1,0 +1,90 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'app.dart';
+import 'core/database/app_database.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final db = AppDatabase(buildConnection());
+  await _loadSeedDataIfNeeded(db);
+  runApp(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+      ],
+      child: const SolvorTutorApp(),
+    ),
+  );
+}
+
+Future<void> _loadSeedDataIfNeeded(AppDatabase db) async {
+  final loaded = await db.isSeedLoaded();
+  if (loaded) return;
+
+  await db.transaction(() async {
+    await _loadTaxonomy(db);
+    await _loadSeedQuestions(db);
+  });
+}
+
+Future<void> _loadTaxonomy(AppDatabase db) async {
+  final jsonStr = await rootBundle.loadString('assets/seed_data/taxonomy.json');
+  final List<dynamic> nodes = jsonDecode(jsonStr) as List<dynamic>;
+
+  for (final node in nodes) {
+    await db.into(db.taxonomyNodes).insert(
+          TaxonomyNodesCompanion.insert(
+            id: node['id'] as String,
+            name: node['name'] as String,
+            parentId: Value<String?>(node['parent_id'] as String?),
+            level: node['level'] as int,
+          ),
+        );
+  }
+}
+
+Future<void> _loadSeedQuestions(AppDatabase db) async {
+  final jsonStr =
+      await rootBundle.loadString('assets/seed_data/seed_questions.json');
+  final List<dynamic> questions = jsonDecode(jsonStr) as List<dynamic>;
+
+  for (final q in questions) {
+    final optsEn = (q['options_en'] as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
+    final optsHi = (q['options_hi'] as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
+
+    final shortcutFormulaNote = q['shortcut_formula_note'] as String?;
+    final commonMistakeNote = q['common_mistake_note'] as String?;
+
+    await db.into(db.questions).insert(
+          QuestionsCompanion.insert(
+            id: q['id'] as String,
+            taxonomyId: q['taxonomy_id'] as String,
+            questionEn: q['question_en'] as String,
+            questionHi: q['question_hi'] as String,
+            optionsEn: jsonEncode(optsEn),
+            optionsHi: jsonEncode(optsHi),
+            correctOption: q['correct_option'] as int,
+            difficultyLevel: q['difficulty_level'] as String,
+            explanationEn: q['explanation_en'] as String,
+            explanationHi: q['explanation_hi'] as String,
+            explanationHinglish: q['explanation_hinglish'] as String,
+            shortcutFormulaNote: shortcutFormulaNote != null
+                ? Value(shortcutFormulaNote)
+                : Value.absent(),
+            commonMistakeNote: commonMistakeNote != null
+                ? Value(commonMistakeNote)
+                : Value.absent(),
+            createdAt: DateTime.now(),
+          ),
+        );
+  }
+}

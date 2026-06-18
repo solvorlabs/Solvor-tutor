@@ -1,0 +1,170 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Quantitative Aptitude",
+    "parent_id": null,
+    "level": 0
+  },
+  {
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "name": "Logical Reasoning",
+    "parent_id": null,
+    "level": 0
+  },
+  {
+    "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+    "name": "English Language",
+    "parent_id": null,
+    "level": 0
+  },
+  {
+    "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "name": "Arithmetic",
+    "parent_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "level": 1
+  },
+  {
+    "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+    "name": "Algebra",
+    "parent_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "level": 1
+  },
+  {
+    "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+    "name": "Verbal Reasoning",
+    "parent_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "level": 1
+  },
+  {
+    "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+    "name": "Non-Verbal Reasoning",
+    "parent_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "level": 1
+  },
+  {
+    "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+    "name": "Grammar",
+    "parent_id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+    "level": 1
+  },
+  {
+    "id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+    "name": "Vocabulary",
+    "parent_id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+    "level": 1
+  },
+  {
+    "id": "d0e1f2a3-b4c5-6789-defa-890123456789",
+    "name": "Percentages",
+    "parent_id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "level": 2
+  },
+  {
+    "id": "e1f2a3b4-c5d6-7890-efab-901234567890",
+    "name": "Profit & Loss",
+    "parent_id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "level": 2
+  },
+  {
+    "id": "f2a3b4c5-d6e7-8901-fabc-012345678901",
+    "name": "Linear Equations",
+    "parent_id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+    "level": 2
+  },
+  {
+    "id": "a3b4c5d6-e7f8-9012-abcd-123456789012",
+    "name": "Quadratic Equations",
+    "parent_id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+    "level": 2
+  },
+  {
+    "id": "b4c5d6e7-f8a9-0123-bcde-234567890123",
+    "name": "Blood Relations",
+    "parent_id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+    "level": 2
+  },
+  {
+    "id": "c5d6e7f8-a9b0-1234-cdef-345678901234",
+    "name": "Syllogisms",
+    "parent_id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+    "level": 2
+  },
+  {
+    "id": "d6e7f8a9-b0c1-2345-defa-456789012345",
+    "name": "Series Completion",
+    "parent_id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+    "level": 2
+  },
+  {
+    "id": "e7f8a9b0-c1d2-3456-efab-567890123456",
+    "name": "Mirror Images",
+    "parent_id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+    "level": 2
+  },
+  {
+    "id": "f8a9b0c1-d2e3-4567-fabc-678901234567",
+    "name": "Tenses",
+    "parent_id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+    "level": 2
+  },
+  {
+    "id": "a9b0c1d2-e3f4-5678-abcd-789012345678",
+    "name": "Active-Passive Voice",
+    "parent_id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+    "level": 2
+  },
+  {
+    "id": "b0c1d2e3-f4a5-6789-bcde-890123456789",
+    "name": "Synonyms & Antonyms",
+    "parent_id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+    "level": 2
+  },
+  {
+    "id": "c1d2e3f4-a5b6-7890-cdef-901234567890",
+    "name": "Idioms & Phrases",
+    "parent_id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+    "level": 2
+  },
+  {
+    "id": "d2e3f4a5-b6c7-8901-defa-012345678901",
+    "name": "General Knowledge",
+    "parent_id": null,
+    "level": 0
+  },
+  {
+    "id": "e3f4a5b6-c7d8-9012-efab-123456789012",
+    "name": "Current Affairs",
+    "parent_id": "d2e3f4a5-b6c7-8901-defa-012345678901",
+    "level": 1
+  },
+  {
+    "id": "f4a5b6c7-d8e9-0123-fabc-234567890123",
+    "name": "Static GK",
+    "parent_id": "d2e3f4a5-b6c7-8901-defa-012345678901",
+    "level": 1
+  },
+  {
+    "id": "a5b6c7d8-e9f0-1234-abcd-345678901234",
+    "name": "National Events",
+    "parent_id": "e3f4a5b6-c7d8-9012-efab-123456789012",
+    "level": 2
+  },
+  {
+    "id": "b6c7d8e9-f0a1-2345-bcde-456789012345",
+    "name": "International Events",
+    "parent_id": "e3f4a5b6-c7d8-9012-efab-123456789012",
+    "level": 2
+  },
+  {
+    "id": "c7d8e9f0-a1b2-3456-cdef-567890123456",
+    "name": "Indian History",
+    "parent_id": "f4a5b6c7-d8e9-0123-fabc-234567890123",
+    "level": 2
+  },
+  {
+    "id": "d8e9f0a1-b2c3-4567-defa-678901234567",
+    "name": "Indian Geography",
+    "parent_id": "f4a5b6c7-d8e9-0123-fabc-234567890123",
+    "level": 2
+  }
+]
