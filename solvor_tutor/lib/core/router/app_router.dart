@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../modules/home/presentation/home_screen.dart';
 import '../../modules/onboarding/presentation/onboarding_screen.dart';
+import '../../modules/diagnostic/presentation/diagnostic_start_screen.dart';
+import '../../modules/test_engine/presentation/screens/test_screen.dart';
+import '../../modules/review/presentation/screens/review_screen.dart';
 import '../auth/auth_state.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -37,28 +40,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/diagnostic',
         name: 'diagnostic',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Diagnostic Screen')),
-        ),
+        builder: (context, state) => const DiagnosticStartScreen(),
       ),
       GoRoute(
         path: '/test/:testId',
         name: 'test',
         builder: (context, state) {
           final testId = state.pathParameters['testId'] ?? '';
-          return Scaffold(
-            body: Center(child: Text('Test Screen: $testId')),
-          );
+          return TestScreen(testId: testId);
         },
       ),
       GoRoute(
-        path: '/review/:attemptId',
+        path: '/review/:testId',
         name: 'review',
         builder: (context, state) {
-          final attemptId = state.pathParameters['attemptId'] ?? '';
-          return Scaffold(
-            body: Center(child: Text('Review Screen: $attemptId')),
-          );
+          final testId = state.pathParameters['testId'] ?? '';
+          return ReviewScreen(testId: testId);
         },
       ),
       GoRoute(

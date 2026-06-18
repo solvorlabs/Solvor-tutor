@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,12 +9,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Solvor Tutor'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -44,7 +39,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.play_circle,
                     label: 'Diagnostic Test',
                     color: Theme.of(context).colorScheme.primary,
-                    onTap: () {},
+                    onTap: () => context.go('/diagnostic'),
                   ),
                   _DashboardCard(
                     icon: Icons.assignment,
@@ -56,13 +51,13 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.book,
                     label: 'Error Notebook',
                     color: Colors.green,
-                    onTap: () {},
+                    onTap: () => context.go('/error-notebook'),
                   ),
                   _DashboardCard(
                     icon: Icons.auto_awesome,
                     label: 'AI Tutor',
                     color: Colors.purple,
-                    onTap: () {},
+                    onTap: () => context.go('/ai-tutor'),
                   ),
                 ],
               ),

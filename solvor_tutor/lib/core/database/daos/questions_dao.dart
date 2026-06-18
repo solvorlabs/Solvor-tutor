@@ -17,6 +17,12 @@ class QuestionsDao extends DatabaseAccessor<AppDatabase>
     return results.isEmpty ? null : results.first;
   }
 
+  Future<TaxonomyNode?> getTaxonomyNode(String id) async {
+    final results =
+        await (select(taxonomyNodes)..where((t) => t.id.equals(id))).get();
+    return results.isEmpty ? null : results.first;
+  }
+
   Future<List<Question>> getQuestionsByTaxonomy(String taxonomyId) async {
     return (select(questions)
           ..where((t) => t.taxonomyId.equals(taxonomyId)))
