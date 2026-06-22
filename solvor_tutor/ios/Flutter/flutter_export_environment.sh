@@ -1,7 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/codemaster29/flutter"
+export "FLUTTER_ROOT=/home/codemaster29/fvm/versions/stable"
 export "FLUTTER_APPLICATION_PATH=/home/codemaster29/Documents/Projects/Samsung_Hackathon_Document/solvor_tutor"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/home/codemaster29/Documents/Projects/Samsung_Hackathon_Document/solvor_tutor/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"

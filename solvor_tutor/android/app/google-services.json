@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "923504451363",
+    "project_id": "virtual-guardian-3d3f6",
+    "storage_bucket": "virtual-guardian-3d3f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923504451363:android:2cfc3dd9940b1aeb34f696",
+        "android_client_info": {
+          "package_name": "com.example.solvor_tutor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArRTxpxfgZl7Gg5-hgov51zJs5oJnExyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923504451363:android:a28913fa8ba7c56a34f696",
+        "android_client_info": {
+          "package_name": "com.example.women_safety_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArRTxpxfgZl7Gg5-hgov51zJs5oJnExyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/l10n/strings_provider.dart';
 import '../../data/error_notebook_repository.dart';
 import '../error_notebook_provider.dart';
 
@@ -46,9 +48,16 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(langProvider);
     if (_items.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Flashcard Review')),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/home'),
+          ),
+          title: const Text('Flashcard Review'),
+        ),
         body: const Center(child: Text('No cards to review')),
       );
     }
@@ -305,8 +314,8 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _submitReview(false),
                       icon: const Icon(Icons.refresh, color: Colors.red),
-                      label: const Text('Review Again',
-                          style: TextStyle(color: Colors.red)),
+                      label: Text(AppStrings.get('flashcard_wrong', lang),
+                          style: const TextStyle(color: Colors.red)),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -318,7 +327,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _submitReview(true),
                       icon: const Icon(Icons.check_circle),
-                      label: const Text('Got it'),
+                      label: Text(AppStrings.get('flashcard_correct', lang)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

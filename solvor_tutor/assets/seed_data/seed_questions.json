@@ -200,6 +200,116 @@
     "common_mistake_note": "Students confuse Damodar (Bengal) with Kosi (Bihar), both associated with floods."
   },
   {
+    "id": "q001-0000-0000-0000-000000000014",
+    "taxonomy_id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "question_en": "A can do a work in 10 days, B can do it in 15 days. In how many days can they finish it together?",
+    "question_hi": "A कोई काम 10 दिन में और B उसे 15 दिन में कर सकता है। दोनों मिलकर उसे कितने दिनों में पूरा करेंगे?",
+    "options_en": ["4 days", "5 days", "6 days", "8 days"],
+    "options_hi": ["4 दिन", "5 दिन", "6 दिन", "8 दिन"],
+    "correct_option": 2,
+    "difficulty_level": "medium",
+    "explanation_en": "A's 1 day work = 1/10, B's 1 day work = 1/15. Together = 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6. So they finish in 6 days.",
+    "explanation_hi": "A का 1 दिन का काम = 1/10, B का = 1/15। मिलकर = 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6। तो वे 6 दिन में पूरा करेंगे।",
+    "explanation_hinglish": "A ka 1 din ka kaam = 1/10, B ka = 1/15. Milkar = 1/10 + 1/15 = 5/30 = 1/6. Toh 6 din mein complete hoga.",
+    "shortcut_formula_note": "Together = (A×B)/(A+B) = (10×15)/(10+15) = 150/25 = 6 days",
+    "common_mistake_note": "Students add the days (10+15=25) instead of adding the work rates (1/10 + 1/15)."
+  },
+  {
+    "id": "q001-0000-0000-0000-000000000015",
+    "taxonomy_id": "e7f8a9b0-c1d2-3456-efab-567890123456",
+    "question_en": "A clock is placed facing a mirror. The time in the mirror shows 08:20. What is the actual time?",
+    "question_hi": "एक घड़ी दर्पण के सामने रखी गई है। दर्पण में समय 08:20 दिखता है। वास्तविक समय क्या है?",
+    "options_en": ["03:40", "04:40", "03:20", "04:20"],
+    "options_hi": ["03:40", "04:40", "03:20", "04:20"],
+    "correct_option": 0,
+    "difficulty_level": "medium",
+    "explanation_en": "For clock mirror images, subtract the mirror time from 11:60. 11:60 - 08:20 = 03:40. So the actual time is 03:40.",
+    "explanation_hi": "घड़ी की दर्पण छवियों के लिए, दर्पण समय को 11:60 से घटाएं। 11:60 - 08:20 = 03:40। तो वास्तविक समय 03:40 है।",
+    "explanation_hinglish": "Clock mirror image ke liye, mirror time ko 11:60 se ghatao. 11:60 - 08:20 = 03:40. Actual time 03:40 hai.",
+    "shortcut_formula_note": "Mirror time formula: 11:60 minus mirror reading (if time is before 12)",
+    "common_mistake_note": "Students subtract from 12:00 instead of 11:60, getting 03:40 confused with 03:40."
+  },
+  {
+    "id": "q001-0000-0000-0000-000000000016",
+    "taxonomy_id": "c5d6e7f8-a9b0-1234-cdef-345678901234",
+    "question_en": "Some birds are flowers. All flowers are trees. Conclusions: I. Some birds are trees. II. Some trees are birds.",
+    "question_hi": "कुछ पक्षी फूल हैं। सभी फूल पेड़ हैं। निष्कर्ष: I. कुछ पक्षी पेड़ हैं। II. कुछ पेड़ पक्षी हैं।",
+    "options_en": [
+      "Only I follows",
+      "Only II follows",
+      "Both I and II follow",
+      "Neither follows"
+    ],
+    "options_hi": [
+      "केवल I सही है",
+      "केवल II सही है",
+      "I और II दोनों सही हैं",
+      "न तो I न II"
+    ],
+    "correct_option": 2,
+    "difficulty_level": "medium",
+    "explanation_en": "Some birds are flowers (given) + All flowers are trees → Some birds are trees (I follows). Since some birds are trees, by conversion, some trees are birds (II follows). Both conclusions are valid.",
+    "explanation_hi": "कुछ पक्षी फूल हैं + सभी फूल पेड़ हैं → कुछ पक्षी पेड़ हैं (I सही है)। चूँकि कुछ पक्षी पेड़ हैं, इसलिए conversion से कुछ पेड़ पक्षी हैं (II सही है)।",
+    "explanation_hinglish": "Some birds flowers hain + All flowers trees hain → Some birds trees hain (I follows). Conversion se some trees birds hain (II follows). Dono sahi hain.",
+    "shortcut_formula_note": "Some A are B + All B are C → Some A are C (valid). And by conversion: Some C are A.",
+    "common_mistake_note": "Students accept I but reject II, forgetting that 'Some A are C' can always be converted to 'Some C are A'."
+  },
+  {
+    "id": "q001-0000-0000-0000-000000000017",
+    "taxonomy_id": "a9b0c1d2-e3f4-5678-abcd-789012345678",
+    "question_en": "Change to passive voice: 'The teacher teaches the students every day.'",
+    "question_hi": "Passive voice में बदलें: 'The teacher teaches the students every day.'",
+    "options_en": [
+      "The students are taught by the teacher every day.",
+      "The students were taught by the teacher every day.",
+      "The students have been taught by the teacher every day.",
+      "The students taught by the teacher every day."
+    ],
+    "options_hi": [
+      "The students are taught by the teacher every day.",
+      "The students were taught by the teacher every day.",
+      "The students have been taught by the teacher every day.",
+      "The students taught by the teacher every day."
+    ],
+    "correct_option": 0,
+    "difficulty_level": "easy",
+    "explanation_en": "The sentence is in Simple Present tense. Passive voice of Simple Present: Object + is/am/are + V3 + by + Subject. 'Students' (plural) takes 'are'. V3 of teach = taught.",
+    "explanation_hi": "वाक्य Simple Present tense में है। Simple Present का Passive: Object + is/am/are + V3 + by + Subject। 'Students' (बहुवचन) के साथ 'are' आता है। teach की V3 = taught।",
+    "explanation_hinglish": "Sentence Simple Present mein hai. Passive: Object + is/am/are + V3 + by + Subject. 'Students' plural hai toh 'are'. teach ki V3 = taught.",
+    "shortcut_formula_note": "Simple Present passive: Subject + is/am/are + past participle + by + object",
+    "common_mistake_note": "Students use 'were' (past tense) instead of 'are' for simple present passive voice."
+  },
+  {
+    "id": "q001-0000-0000-0000-000000000018",
+    "taxonomy_id": "f8a9b0c1-d2e3-4567-fabc-678901234567",
+    "question_en": "Fill in the blank: If I ___ rich, I would travel the world.",
+    "question_hi": "रिक्त स्थान भरें: If I ___ rich, I would travel the world.",
+    "options_en": ["am", "was", "were", "will be"],
+    "options_hi": ["am", "was", "were", "will be"],
+    "correct_option": 2,
+    "difficulty_level": "medium",
+    "explanation_en": "This is a Type 2 conditional (hypothetical/unreal present). The structure is: If + Past Subjunctive (were), + would + base verb. 'Were' is used for all subjects in subjunctive mood.",
+    "explanation_hi": "यह Type 2 conditional (काल्पनिक/अवास्तविक वर्तमान) है। संरचना: If + Past Subjunctive (were), + would + base verb। Subjunctive mood में सभी subjects के साथ 'were' आता है।",
+    "explanation_hinglish": "Yeh Type 2 conditional hai (hypothetical present). Structure: If + were + would + base verb. Subjunctive mood mein sab subjects ke saath 'were' use hota hai.",
+    "shortcut_formula_note": "Type 2 conditional: If + Subject + were (always), Subject + would + V1",
+    "common_mistake_note": "Students use 'was' instead of 'were' for first person singular (I was → wrong; I were → correct in subjunctive)."
+  },
+  {
+    "id": "q001-0000-0000-0000-000000000019",
+    "taxonomy_id": "b5c6d7e8-f9a0-1234-bcde-456789012345",
+    "question_en": "Which country hosted the G20 Summit in 2023?",
+    "question_hi": "2023 में G20 शिखर सम्मेलन किस देश ने आयोजित किया था?",
+    "options_en": ["China", "USA", "India", "Germany"],
+    "options_hi": ["चीन", "अमेरिका", "भारत", "जर्मनी"],
+    "correct_option": 2,
+    "difficulty_level": "easy",
+    "explanation_en": "India hosted the G20 Summit 2023 in New Delhi on September 9-10, 2023. The theme was 'Vasudhaiva Kutumbakam' (One Earth, One Family, One Future).",
+    "explanation_hi": "भारत ने 9-10 सितंबर 2023 को नई दिल्ली में G20 शिखर सम्मेलन 2023 की मेजबानी की। थीम थी 'वसुधैव कुटुम्बकम' (एक पृथ्वी, एक परिवार, एक भविष्य)।",
+    "explanation_hinglish": "India ne 9-10 September 2023 ko New Delhi mein G20 Summit 2023 host kiya. Theme thi 'Vasudhaiva Kutumbakam'.",
+    "shortcut_formula_note": "G20 2023: India | G20 2024: Brazil | Theme: Vasudhaiva Kutumbakam",
+    "common_mistake_note": "Students confuse G20 host country with UN Security Council president of the same year."
+  },
+  {
     "id": "q001-0000-0000-0000-000000000013",
     "taxonomy_id": "a4b5c6d7-e8f9-0123-abcd-345678901234",
     "question_en": "The Constitution of India came into effect on:",

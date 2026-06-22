@@ -13,11 +13,21 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _phoneNumberMeta =
       const VerificationMeta('phoneNumber');
   @override
   late final GeneratedColumn<String> phoneNumber = GeneratedColumn<String>(
       'phone_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _selectedExamMeta =
       const VerificationMeta('selectedExam');
@@ -58,7 +68,9 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   @override
   List<GeneratedColumn> get $columns => [
         id,
+        name,
         phoneNumber,
+        email,
         selectedExam,
         uiLanguage,
         dailyCapacityMinutes,
@@ -81,11 +93,19 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     } else if (isInserting) {
       context.missing(_idMeta);
     }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
     if (data.containsKey('phone_number')) {
       context.handle(
           _phoneNumberMeta,
           phoneNumber.isAcceptableOrUnknown(
               data['phone_number']!, _phoneNumberMeta));
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
     }
     if (data.containsKey('selected_exam')) {
       context.handle(
@@ -136,8 +156,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     return User(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
       phoneNumber: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}phone_number']),
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email']),
       selectedExam: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}selected_exam']),
       uiLanguage: attachedDatabase.typeMapping
@@ -161,7 +185,9 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 
 class User extends DataClass implements Insertable<User> {
   final String id;
+  final String? name;
   final String? phoneNumber;
+  final String? email;
   final String? selectedExam;
   final String? uiLanguage;
   final int? dailyCapacityMinutes;
@@ -170,7 +196,9 @@ class User extends DataClass implements Insertable<User> {
   final DateTime updatedAt;
   const User(
       {required this.id,
+      this.name,
       this.phoneNumber,
+      this.email,
       this.selectedExam,
       this.uiLanguage,
       this.dailyCapacityMinutes,
@@ -181,8 +209,14 @@ class User extends DataClass implements Insertable<User> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
     if (!nullToAbsent || phoneNumber != null) {
       map['phone_number'] = Variable<String>(phoneNumber);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
     }
     if (!nullToAbsent || selectedExam != null) {
       map['selected_exam'] = Variable<String>(selectedExam);
@@ -202,9 +236,12 @@ class User extends DataClass implements Insertable<User> {
   UsersCompanion toCompanion(bool nullToAbsent) {
     return UsersCompanion(
       id: Value(id),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       phoneNumber: phoneNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(phoneNumber),
+      email:
+          email == null && nullToAbsent ? const Value.absent() : Value(email),
       selectedExam: selectedExam == null && nullToAbsent
           ? const Value.absent()
           : Value(selectedExam),
@@ -225,7 +262,9 @@ class User extends DataClass implements Insertable<User> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return User(
       id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String?>(json['name']),
       phoneNumber: serializer.fromJson<String?>(json['phoneNumber']),
+      email: serializer.fromJson<String?>(json['email']),
       selectedExam: serializer.fromJson<String?>(json['selectedExam']),
       uiLanguage: serializer.fromJson<String?>(json['uiLanguage']),
       dailyCapacityMinutes:
@@ -240,7 +279,9 @@ class User extends DataClass implements Insertable<User> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String?>(name),
       'phoneNumber': serializer.toJson<String?>(phoneNumber),
+      'email': serializer.toJson<String?>(email),
       'selectedExam': serializer.toJson<String?>(selectedExam),
       'uiLanguage': serializer.toJson<String?>(uiLanguage),
       'dailyCapacityMinutes': serializer.toJson<int?>(dailyCapacityMinutes),
@@ -252,7 +293,9 @@ class User extends DataClass implements Insertable<User> {
 
   User copyWith(
           {String? id,
+          Value<String?> name = const Value.absent(),
           Value<String?> phoneNumber = const Value.absent(),
+          Value<String?> email = const Value.absent(),
           Value<String?> selectedExam = const Value.absent(),
           Value<String?> uiLanguage = const Value.absent(),
           Value<int?> dailyCapacityMinutes = const Value.absent(),
@@ -261,7 +304,9 @@ class User extends DataClass implements Insertable<User> {
           DateTime? updatedAt}) =>
       User(
         id: id ?? this.id,
+        name: name.present ? name.value : this.name,
         phoneNumber: phoneNumber.present ? phoneNumber.value : this.phoneNumber,
+        email: email.present ? email.value : this.email,
         selectedExam:
             selectedExam.present ? selectedExam.value : this.selectedExam,
         uiLanguage: uiLanguage.present ? uiLanguage.value : this.uiLanguage,
@@ -275,8 +320,10 @@ class User extends DataClass implements Insertable<User> {
   User copyWithCompanion(UsersCompanion data) {
     return User(
       id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
       phoneNumber:
           data.phoneNumber.present ? data.phoneNumber.value : this.phoneNumber,
+      email: data.email.present ? data.email.value : this.email,
       selectedExam: data.selectedExam.present
           ? data.selectedExam.value
           : this.selectedExam,
@@ -296,7 +343,9 @@ class User extends DataClass implements Insertable<User> {
   String toString() {
     return (StringBuffer('User(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('phoneNumber: $phoneNumber, ')
+          ..write('email: $email, ')
           ..write('selectedExam: $selectedExam, ')
           ..write('uiLanguage: $uiLanguage, ')
           ..write('dailyCapacityMinutes: $dailyCapacityMinutes, ')
@@ -308,14 +357,16 @@ class User extends DataClass implements Insertable<User> {
   }
 
   @override
-  int get hashCode => Object.hash(id, phoneNumber, selectedExam, uiLanguage,
-      dailyCapacityMinutes, weakDomains, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, name, phoneNumber, email, selectedExam,
+      uiLanguage, dailyCapacityMinutes, weakDomains, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is User &&
           other.id == this.id &&
+          other.name == this.name &&
           other.phoneNumber == this.phoneNumber &&
+          other.email == this.email &&
           other.selectedExam == this.selectedExam &&
           other.uiLanguage == this.uiLanguage &&
           other.dailyCapacityMinutes == this.dailyCapacityMinutes &&
@@ -326,7 +377,9 @@ class User extends DataClass implements Insertable<User> {
 
 class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> id;
+  final Value<String?> name;
   final Value<String?> phoneNumber;
+  final Value<String?> email;
   final Value<String?> selectedExam;
   final Value<String?> uiLanguage;
   final Value<int?> dailyCapacityMinutes;
@@ -336,7 +389,9 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<int> rowid;
   const UsersCompanion({
     this.id = const Value.absent(),
+    this.name = const Value.absent(),
     this.phoneNumber = const Value.absent(),
+    this.email = const Value.absent(),
     this.selectedExam = const Value.absent(),
     this.uiLanguage = const Value.absent(),
     this.dailyCapacityMinutes = const Value.absent(),
@@ -347,7 +402,9 @@ class UsersCompanion extends UpdateCompanion<User> {
   });
   UsersCompanion.insert({
     required String id,
+    this.name = const Value.absent(),
     this.phoneNumber = const Value.absent(),
+    this.email = const Value.absent(),
     this.selectedExam = const Value.absent(),
     this.uiLanguage = const Value.absent(),
     this.dailyCapacityMinutes = const Value.absent(),
@@ -361,7 +418,9 @@ class UsersCompanion extends UpdateCompanion<User> {
         updatedAt = Value(updatedAt);
   static Insertable<User> custom({
     Expression<String>? id,
+    Expression<String>? name,
     Expression<String>? phoneNumber,
+    Expression<String>? email,
     Expression<String>? selectedExam,
     Expression<String>? uiLanguage,
     Expression<int>? dailyCapacityMinutes,
@@ -372,7 +431,9 @@ class UsersCompanion extends UpdateCompanion<User> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (name != null) 'name': name,
       if (phoneNumber != null) 'phone_number': phoneNumber,
+      if (email != null) 'email': email,
       if (selectedExam != null) 'selected_exam': selectedExam,
       if (uiLanguage != null) 'ui_language': uiLanguage,
       if (dailyCapacityMinutes != null)
@@ -386,7 +447,9 @@ class UsersCompanion extends UpdateCompanion<User> {
 
   UsersCompanion copyWith(
       {Value<String>? id,
+      Value<String?>? name,
       Value<String?>? phoneNumber,
+      Value<String?>? email,
       Value<String?>? selectedExam,
       Value<String?>? uiLanguage,
       Value<int?>? dailyCapacityMinutes,
@@ -396,7 +459,9 @@ class UsersCompanion extends UpdateCompanion<User> {
       Value<int>? rowid}) {
     return UsersCompanion(
       id: id ?? this.id,
+      name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
       selectedExam: selectedExam ?? this.selectedExam,
       uiLanguage: uiLanguage ?? this.uiLanguage,
       dailyCapacityMinutes: dailyCapacityMinutes ?? this.dailyCapacityMinutes,
@@ -413,8 +478,14 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
     if (phoneNumber.present) {
       map['phone_number'] = Variable<String>(phoneNumber.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
     }
     if (selectedExam.present) {
       map['selected_exam'] = Variable<String>(selectedExam.value);
@@ -444,7 +515,9 @@ class UsersCompanion extends UpdateCompanion<User> {
   String toString() {
     return (StringBuffer('UsersCompanion(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('phoneNumber: $phoneNumber, ')
+          ..write('email: $email, ')
           ..write('selectedExam: $selectedExam, ')
           ..write('uiLanguage: $uiLanguage, ')
           ..write('dailyCapacityMinutes: $dailyCapacityMinutes, ')
@@ -3420,7 +3493,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   required String id,
+  Value<String?> name,
   Value<String?> phoneNumber,
+  Value<String?> email,
   Value<String?> selectedExam,
   Value<String?> uiLanguage,
   Value<int?> dailyCapacityMinutes,
@@ -3431,7 +3506,9 @@ typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
 });
 typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<String> id,
+  Value<String?> name,
   Value<String?> phoneNumber,
+  Value<String?> email,
   Value<String?> selectedExam,
   Value<String?> uiLanguage,
   Value<int?> dailyCapacityMinutes,
@@ -3452,8 +3529,14 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get selectedExam => $composableBuilder(
       column: $table.selectedExam, builder: (column) => ColumnFilters(column));
@@ -3487,8 +3570,14 @@ class $$UsersTableOrderingComposer
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get selectedExam => $composableBuilder(
       column: $table.selectedExam,
@@ -3523,8 +3612,14 @@ class $$UsersTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
   GeneratedColumn<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
 
   GeneratedColumn<String> get selectedExam => $composableBuilder(
       column: $table.selectedExam, builder: (column) => column);
@@ -3569,7 +3664,9 @@ class $$UsersTableTableManager extends RootTableManager<
               $$UsersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
+            Value<String?> name = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
+            Value<String?> email = const Value.absent(),
             Value<String?> selectedExam = const Value.absent(),
             Value<String?> uiLanguage = const Value.absent(),
             Value<int?> dailyCapacityMinutes = const Value.absent(),
@@ -3580,7 +3677,9 @@ class $$UsersTableTableManager extends RootTableManager<
           }) =>
               UsersCompanion(
             id: id,
+            name: name,
             phoneNumber: phoneNumber,
+            email: email,
             selectedExam: selectedExam,
             uiLanguage: uiLanguage,
             dailyCapacityMinutes: dailyCapacityMinutes,
@@ -3591,7 +3690,9 @@ class $$UsersTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String id,
+            Value<String?> name = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
+            Value<String?> email = const Value.absent(),
             Value<String?> selectedExam = const Value.absent(),
             Value<String?> uiLanguage = const Value.absent(),
             Value<int?> dailyCapacityMinutes = const Value.absent(),
@@ -3602,7 +3703,9 @@ class $$UsersTableTableManager extends RootTableManager<
           }) =>
               UsersCompanion.insert(
             id: id,
+            name: name,
             phoneNumber: phoneNumber,
+            email: email,
             selectedExam: selectedExam,
             uiLanguage: uiLanguage,
             dailyCapacityMinutes: dailyCapacityMinutes,

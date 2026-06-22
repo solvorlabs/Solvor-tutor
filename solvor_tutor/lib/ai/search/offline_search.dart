@@ -82,15 +82,37 @@ class OfflineSearchEngine {
             .toList();
       } catch (_) {
         _ftsAvailable = false;
-        return _fallbackSearch(query, language);
+        return await _fallbackSearch(query, language);
       }
     }
 
-    return _fallbackSearch(query, language);
+    return await _fallbackSearch(query, language);
   }
 
-  List<SearchResult> _fallbackSearch(String query, String language) {
-    return [];
+  Future<List<SearchResult>> _fallbackSearch(String query, String language) async {
+    try {
+      final langColumn = language == 'hi' ? 'question_hi' : 'question_en';
+      final explColumn = language == 'hi' ? 'explanation_hi' : 'explanation_en';
+      final like = '%${query.replaceAll("'", "''")}%';
+      final rows = await _db.customSelect(
+        'SELECT id AS question_id, $langColumn AS question_text, '
+        '$explColumn AS explanation_text, 0.0 AS score '
+        'FROM questions '
+        'WHERE $langColumn LIKE ?1 '
+        'LIMIT 5',
+        variables: [Variable(like)],
+      ).get();
+      return rows
+          .map((row) => SearchResult(
+                questionId: row.data['question_id'] as String,
+                questionText: row.data['question_text'] as String,
+                explanationText: row.data['explanation_text'] as String,
+                relevanceScore: row.data['score'] as double,
+              ))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   String _sanitizeQuery(String query) {

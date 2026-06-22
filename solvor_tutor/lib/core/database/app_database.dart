@@ -18,7 +18,9 @@ part 'app_database.g.dart';
 
 class Users extends Table {
   TextColumn get id => text()();
+  TextColumn get name => text().nullable()();
   TextColumn get phoneNumber => text().nullable()();
+  TextColumn get email => text().nullable()();
   TextColumn get selectedExam => text().nullable()();
   TextColumn get uiLanguage => text().nullable()();
   IntColumn get dailyCapacityMinutes => integer().nullable()();
@@ -147,12 +149,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.addColumn(users, users.name);
+            await m.addColumn(users, users.email);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA journal_mode=WAL;');

@@ -3,11 +3,13 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/users_dao.dart';
+
 import '../domain/onboarding_use_case.dart';
 import '../domain/profile_entity.dart';
 
 class OnboardingState {
   final int currentStep;
+  final String? name;
   final String phoneNumber;
   final bool isOtpVerified;
   final String? selectedExam;
@@ -19,6 +21,7 @@ class OnboardingState {
 
   const OnboardingState({
     this.currentStep = 0,
+    this.name,
     this.phoneNumber = '',
     this.isOtpVerified = false,
     this.selectedExam,
@@ -31,6 +34,7 @@ class OnboardingState {
 
   OnboardingState copyWith({
     int? currentStep,
+    String? name,
     String? phoneNumber,
     bool? isOtpVerified,
     String? selectedExam,
@@ -42,6 +46,7 @@ class OnboardingState {
   }) {
     return OnboardingState(
       currentStep: currentStep ?? this.currentStep,
+      name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       isOtpVerified: isOtpVerified ?? this.isOtpVerified,
       selectedExam: selectedExam ?? this.selectedExam,
@@ -58,6 +63,10 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
   final OnboardingUseCase _useCase;
 
   OnboardingNotifier(this._useCase) : super(const OnboardingState());
+
+  void setName(String name) {
+    state = state.copyWith(name: name);
+  }
 
   void setPhoneNumber(String phone) {
     state = state.copyWith(phoneNumber: phone);
@@ -108,6 +117,7 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
     try {
       final profile = ProfileEntity(
         id: const Uuid().v4(),
+        name: state.name,
         phoneNumber: state.phoneNumber,
         selectedExam: state.selectedExam ?? 'SSC',
         uiLanguage: state.uiLanguage ?? 'English',
@@ -143,3 +153,14 @@ final onboardingProvider =
   final useCase = ref.watch(onboardingUseCaseProvider);
   return OnboardingNotifier(useCase);
 });
+
+final currentUserProvider = FutureProvider<User?>((ref) {
+  final dao = ref.watch(usersDaoProvider);
+  return dao.getUser();
+});
+
+enum AuthMethod { phone, google }
+
+final authMethodProvider = StateProvider<AuthMethod?>((ref) => null);
+
+final verificationIdProvider = StateProvider<String?>((ref) => null);

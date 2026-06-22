@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
+import '../../../core/l10n/strings_provider.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/questions_dao.dart';
 import '../../../core/database/daos/tests_dao.dart';
@@ -18,8 +20,15 @@ class DiagnosticStartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(langProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Diagnostic Test')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
+        ),
+        title: Text(AppStrings.get('diagnostic_title', lang)),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -33,7 +42,7 @@ class DiagnosticStartScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Diagnostic Assessment',
+              AppStrings.get('diagnostic_assessment', lang),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -41,7 +50,7 @@ class DiagnosticStartScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'This quick test will assess your current level across all subjects.',
+              AppStrings.get('diagnostic_desc', lang),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),
@@ -50,19 +59,19 @@ class DiagnosticStartScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             _InfoRow(
               icon: Icons.quiz_outlined,
-              label: 'Questions',
+              label: AppStrings.get('diagnostic_questions', lang),
               value: '20',
             ),
             const SizedBox(height: 12),
             _InfoRow(
               icon: Icons.timer_outlined,
-              label: 'Time Limit',
+              label: AppStrings.get('diagnostic_time_limit', lang),
               value: '20 minutes',
             ),
             const SizedBox(height: 12),
             _InfoRow(
               icon: Icons.category_outlined,
-              label: 'Subjects',
+              label: AppStrings.get('diagnostic_subjects', lang),
               value: 'Quant, Reasoning, English, GK',
             ),
             const Spacer(flex: 2),
@@ -81,7 +90,7 @@ class DiagnosticStartScreen extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Start Test', style: TextStyle(fontSize: 18)),
+              child: Text(AppStrings.get('diagnostic_start', lang), style: const TextStyle(fontSize: 18)),
             ),
             const Spacer(),
           ],
@@ -112,12 +121,17 @@ class _InfoRow extends StatelessWidget {
             Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 16),
             Text(label, style: Theme.of(context).textTheme.titleMedium),
-            const Spacer(),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             ),
           ],
         ),

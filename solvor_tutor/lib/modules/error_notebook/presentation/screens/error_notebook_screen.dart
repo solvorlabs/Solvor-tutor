@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/l10n/strings_provider.dart';
 import '../../data/error_notebook_repository.dart';
 import '../error_notebook_provider.dart';
 
@@ -12,11 +14,12 @@ class ErrorNotebookScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(langProvider);
     final queueAsync = ref.watch(errorNotebookProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Error Notebook'),
+        title: Text(AppStrings.get('error_notebook_title', lang)),
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () => context.go('/home'),

@@ -19,7 +19,13 @@ class LanguagePickerScreen extends ConsumerWidget {
     final notifier = ref.read(onboardingProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Choose Language')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => ref.read(onboardingProvider.notifier).previousStep(),
+        ),
+        title: const Text('Choose Language'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -50,7 +56,7 @@ class LanguagePickerScreen extends ConsumerWidget {
                   label: lang.$1,
                   subtitle: lang.$1 == 'Hinglish'
                       ? 'Hindi + English mix'
-                      : 'All content in $lang',
+                      : 'All content in ${lang.$1}',
                   isSelected: state.uiLanguage == lang.$2,
                   onTap: () => notifier.setLanguage(lang.$2),
                 ),

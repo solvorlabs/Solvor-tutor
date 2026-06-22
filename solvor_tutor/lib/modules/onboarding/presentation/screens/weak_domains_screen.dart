@@ -22,7 +22,13 @@ class WeakDomainsScreen extends ConsumerWidget {
     final notifier = ref.read(onboardingProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Weak Areas')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => ref.read(onboardingProvider.notifier).previousStep(),
+        ),
+        title: const Text('Weak Areas'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

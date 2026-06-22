@@ -10,6 +10,7 @@ import '../../modules/review/presentation/screens/review_screen.dart';
 import '../../modules/error_notebook/presentation/screens/error_notebook_screen.dart';
 import '../../modules/error_notebook/presentation/screens/flashcard_screen.dart';
 import '../../modules/ai_tutor/presentation/screens/ai_tutor_screen.dart';
+import '../../modules/settings/settings_screen.dart';
 import '../auth/auth_state.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -24,9 +25,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authState.isLoading) return null;
 
       final isOnOnboarding = state.matchedLocation == '/onboarding';
+      final isProtected = !isOnOnboarding;
 
       if (authState.isLoggedIn && isOnOnboarding) return '/home';
-      if (!authState.isLoggedIn && !isOnOnboarding) return '/onboarding';
+      if (!authState.isLoggedIn && isProtected) return '/onboarding';
       return null;
     },
     routes: [
@@ -77,6 +79,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/ai-tutor',
         name: 'ai-tutor',
         builder: (context, state) => const AiTutorScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );

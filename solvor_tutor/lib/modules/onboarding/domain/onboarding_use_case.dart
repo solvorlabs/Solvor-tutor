@@ -14,6 +14,7 @@ class OnboardingUseCase {
   Future<void> saveProfile(ProfileEntity profile) async {
     final companion = UsersCompanion.insert(
       id: profile.id,
+      name: Value(profile.name),
       phoneNumber: Value(profile.phoneNumber),
       selectedExam: Value(profile.selectedExam),
       uiLanguage: Value(profile.uiLanguage),

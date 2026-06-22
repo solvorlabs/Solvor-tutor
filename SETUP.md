@@ -4,12 +4,12 @@
 
 | Tool | Version | Install |
 |------|---------|---------|
-| Flutter | ≥ 3.2.0 | https://docs.flutter.dev/get-started/install |
-| Dart | ≥ 3.2.0 | Bundled with Flutter |
+| Flutter (FVM) | 3.44.2 | `/home/codemaster29/fvm/versions/stable/bin/flutter` |
+| Dart | 3.12.2 | Bundled with Flutter |
 | Node.js | ≥ 20.x | https://nodejs.org |
 | PostgreSQL | ≥ 15 | https://www.postgresql.org/download |
 | Redis | ≥ 7 | https://redis.io/docs/getting-started |
-| Android Studio | Latest | For emulator / device flashing |
+| Java | 17 | For Android builds |
 
 ---
 
@@ -18,16 +18,79 @@
 ```
 Samsung_Hackathon_Document/
 ├── solvor_tutor/     # Flutter app
-├── backend/          # Node.js API
-└── admin/            # Next.js admin panel
+├── backend/          # Node.js API (optional)
+└── admin/            # Next.js admin panel (optional)
 ```
 
 ---
 
-## 2. Backend
+## 2. Quick Demo (No Backend Needed)
 
-### 2a. Create PostgreSQL database
+The app runs **90% offline** — Firebase Auth and local SQLite handle everything. Backend is only needed for question bank sync.
 
+```bash
+# 1. Set Flutter path
+export PATH="/home/codemaster29/fvm/versions/stable/bin:$PATH"
+
+# 2. Install deps
+cd solvor_tutor
+flutter pub get
+
+# 3. Run on device (replace IP with your laptop's LAN IP)
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk \
+  flutter run --dart-define=API_BASE=http://192.168.x.x:3000
+
+# 4. Or build release APK
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk \
+  flutter build apk --release --dart-define=API_BASE=http://192.168.x.x:3000
+```
+
+> The `API_BASE` is only used for an optional backend call during sign-in (wrapped in try/catch — skipped silently if server is down).
+
+---
+
+## 3. Firebase Setup
+
+### 3a. Project & Auth Providers
+- Firebase project: **virtual-guardian-3d3f6**
+- **Google Sign-In** enabled in Authentication → Sign-in method
+- **Phone Auth** enabled (requires Blaze plan for real SMS; test numbers work on Spark)
+
+### 3b. SHA Fingerprints (for Phone Auth + Google Sign-In)
+```bash
+# Debug keystore
+keytool -list -v -alias androiddebugkey \
+  -keystore ~/.android/debug.keystore \
+  -storepass android -keypass android
+```
+
+Copy **SHA-1** and **SHA-256** to:
+Firebase Console → Project Settings → General → Your apps → Android → SHA certificate fingerprints
+
+### 3c. Test Phone Numbers (No SMS Required)
+Firebase Console → Authentication → Sign-in method → Phone → **Phone numbers for testing**
+Add `+91 8800603512` with code `123456`
+
+### 3d. Firebase Config
+`lib/firebase_options.dart` is already generated and checked in. No changes needed.
+
+---
+
+## 4. Run on Phone via USB
+
+```bash
+export PATH="/home/codemaster29/fvm/versions/stable/bin:$PATH"
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk \
+  flutter run --dart-define=API_BASE=http://192.168.x.x:3000
+```
+
+The app auto-detects USB connection. Use `r` for hot reload, `R` for hot restart.
+
+---
+
+## 5. Backend (Optional — For Question Bank API)
+
+### 5a. Database
 ```bash
 psql -U postgres
 CREATE USER solvor WITH PASSWORD 'solvor_pass';
@@ -35,149 +98,78 @@ CREATE DATABASE solvor_tutor OWNER solvor;
 \q
 ```
 
-### 2b. Configure environment
-
+### 5b. Configure
 ```bash
 cd backend
 cp .env.example .env
-```
-
-Edit `.env`:
-```
-DATABASE_URL=postgresql://solvor:solvor_pass@localhost:5432/solvor_tutor
-JWT_SECRET=<generate a random 64-char string>
-REDIS_URL=redis://localhost:6379
-PORT=3000
-GEMINI_API_KEY=<your Google AI Studio key>
-GROQ_API_KEY=<your Groq API key>
-```
-
-> Get Gemini key: https://aistudio.google.com/app/apikey  
-> Get Groq key: https://console.groq.com/keys
-
-### 2c. Install and migrate
-
-```bash
+# Edit .env with your keys
 npm install
 npm run migrate
-```
-
-Expected output:
-```
-✓ 001_initial_schema.sql applied successfully
-✓ 002_user_attempts.sql applied successfully
-All migrations applied.
-```
-
-### 2d. Start the API
-
-```bash
 npm start
-# or for development with auto-reload:
-npm run dev
 ```
 
-API is live at `http://localhost:3000`. Health check: `GET /health`
-
-### 2e. Start the sync worker (optional for offline testing)
-
-```bash
-node src/workers/sync_consumer.js
-```
+### 5c. Service Account
+Place your Firebase Admin SDK JSON at `backend/serviceAccountKey.json`.
 
 ---
 
-## 3. Flutter App
-
-### 3a. Install dependencies
+## 6. Generating APK for Friends
 
 ```bash
-cd solvor_tutor
-flutter pub get
+export PATH="/home/codemaster29/fvm/versions/stable/bin:$PATH"
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk \
+  flutter build apk --release --dart-define=API_BASE=http://192.168.x.x:3000
 ```
 
-### 3b. Generate Drift code (if .g.dart files are missing or stale)
+APK at: `solvor_tutor/build/app/outputs/flutter-apk/app-release.apk`
 
-```bash
-dart run build_runner build --delete-conflicting-outputs
-```
+Share via Google Drive / WhatsApp / USB.
 
-### 3c. Configure backend URL
-
-Open `lib/sync/sync_service.dart` and check `_baseUrl`. For a physical device on the same network, replace `localhost` with your machine's local IP:
-
-```dart
-// In main.dart where SyncService is instantiated:
-baseUrl: 'http://192.168.x.x:3000'  // your machine's LAN IP
-```
-
-For emulator, `http://10.0.2.2:3000` maps to host localhost.
-
-### 3d. Run on device / emulator
-
-```bash
-flutter run
-# Release build (recommended for performance demo):
-flutter build apk --release
-```
-
-The debug APK is ~125MB. The release APK will be significantly smaller.
-
-### 3e. TFLite model (stub)
-
-`assets/models/intent_classifier.tflite` is currently an empty stub. The intent classifier gracefully falls back to `IntentType.unknown` — all AI Tutor searches still work via FTS5. To upgrade, drop a trained `.tflite` model at that path and re-run `flutter build apk`.
+> Friends only need **internet for first Google Sign-In**. Everything else (tests, review, flashcards, AI search) works fully offline.
 
 ---
 
-## 4. Admin Panel
+## 7. Architecture Overview
 
-### 4a. Install dependencies
-
-```bash
-cd admin
-npm install
+```
+solvor_tutor/
+├── lib/
+│   ├── ai/                    # On-device AI modules
+│   │   ├── edge/              # TFLite intent classifier
+│   │   ├── search/            # FTS5 offline search
+│   │   ├── ocr/               # ML Kit OCR pipeline
+│   │   └── paraphrase/        # Explanation shortener
+│   ├── core/
+│   │   ├── auth/              # Auth state (Riverpod)
+│   │   ├── database/          # Drift/SQLite schema + DAOs
+│   │   ├── router/            # go_router config
+│   │   └── theme/             # Design tokens + neon theme
+│   └── modules/
+│       ├── onboarding/        # Auth method → phone/Google → exam → language → budget → weak subjects
+│       ├── home/              # Dashboard with 4 cards
+│       ├── diagnostic/        # 20-min baseline test builder
+│       ├── test_engine/       # Timer, answer capture, confidence, submit
+│       ├── review/            # Score, accuracy, speed quadrants, explanations
+│       ├── error_notebook/    # Spaced repetition flashcards (1-3-7-14 day intervals)
+│       ├── ai_tutor/          # Search + OCR + explanation paraphrasing
+│       └── settings/          # Profile, theme, language, goals, logout
+└── assets/
+    ├── seed_data/             # 20 bilingual seed questions
+    └── models/                # TFLite intent classifier model
 ```
 
-### 4b. Configure API URL
+## 8. TFLite Model (Stub)
 
-```bash
-# .env.local is already set to localhost:
-NEXT_PUBLIC_API_URL=http://localhost:3000
-```
+`assets/models/intent_classifier.tflite` is a placeholder. The classifier gracefully falls back to keyword-based detection (concept doubt / formula lookup / translation request). To upgrade, drop a trained `.tflite` model at that path and rebuild.
 
-### 4c. Run
-
-```bash
-npm run dev
-# Open http://localhost:4000  (or whatever port Next.js picks)
-```
-
-Login with any phone number — the OTP is printed to the backend console (no SMS provider in dev mode).
-
----
-
-## 5. Full stack in one terminal session
-
-```bash
-# Terminal 1 — Backend
-cd backend && npm start
-
-# Terminal 2 — Admin panel
-cd admin && npm run dev
-
-# Terminal 3 — Flutter
-cd solvor_tutor && flutter run
-```
-
----
-
-## 6. Common issues
+## 9. Common Issues
 
 | Symptom | Fix |
 |---------|-----|
-| `relation "user_attempts" does not exist` | Run `npm run migrate` again — ensure migration 002 ran |
-| Flutter: `No such module 'sqlite3'` | Run `flutter pub get` then rebuild |
-| FTS5 search returns no results | First-launch seed required; uninstall app and reinstall to re-trigger seed load |
-| Camera OCR crashes | Check device has camera permission granted in Android Settings |
-| Sync never fires | Backend must be reachable; check `_baseUrl` in sync_service.dart matches your server IP |
-| Admin login loop | Backend must be running; check browser console for `CORS` or `401` errors |
+| `BILLING_NOT_ENABLED` on phone auth | Use test phone numbers in Firebase Console (no billing needed) |
+| `SMS unable to be sent until this region enabled` | Add India (+91) to SMS region policy in Firebase Console → Authentication → Settings |
+| Flutter build fails with SDK errors | Use FVM Flutter: `export PATH="/home/codemaster29/fvm/versions/stable/bin:$PATH"` |
+| `There is nothing to pop` | Back buttons use `context.go('/home')` — fixed |
+| No questions in DB | Seed data loads on first launch; uninstall and reinstall to re-trigger |
+| Camera OCR crashes | Check camera permission in Android Settings |
+| Google Sign-In fails | Ensure SHA-1 fingerprint is added to Firebase Console |

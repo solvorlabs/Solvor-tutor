@@ -78,6 +78,10 @@ class _TestScreenState extends ConsumerState<TestScreen>
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
+        ),
         title: Text('Q ${session.currentIndex + 1}/${session.totalQuestions}'),
         centerTitle: true,
         actions: [

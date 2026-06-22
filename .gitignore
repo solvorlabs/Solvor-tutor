@@ -5,3 +5,24 @@ CLAUDE.md
 .mcp.jsondocs/
 .mcp.json
 docs
+
+# FVM Version Cache
+.fvm/
+
+# Firebase service account key
+backend/serviceAccountKey.json
+
+# Flutter build artifacts
+solvor_tutor/build/
+solvor_tutor/.dart_tool/
+solvor_tutor/.packages
+solvor_tutor/.pub/
+
+# iOS ephemeral
+solvor_tutor/ios/Flutter/ephemeral/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
