@@ -9,6 +9,7 @@ import '../../core/database/daos/users_dao.dart';
 import '../../core/l10n/app_strings.dart';
 import '../../core/l10n/strings_provider.dart';
 import '../../core/theme/design_tokens.dart';
+import '../../ai/gemma/gemma_provider.dart';
 import '../onboarding/presentation/onboarding_provider.dart';
 import 'profile_edit_screen.dart';
 
@@ -152,6 +153,8 @@ class SettingsScreen extends ConsumerWidget {
           const _InfoRow(label: 'Build', value: 'Samsung Hackathon'),
           Divider(height: 1, color: kSubtle),
           const _InfoRow(label: 'AI Runtime', value: 'LiteRT · On-device'),
+          Divider(height: 1, color: kSubtle),
+          _GemmaSettingsTile(isDark: isDark),
           Divider(height: 1, color: kSubtle),
 
           // ── Logout ───────────────────────────────────────────────────
@@ -439,6 +442,73 @@ class _TappableRow extends StatelessWidget {
               Icons.chevron_right_rounded,
               size: 18,
               color: ink.withOpacity(0.4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GemmaSettingsTile extends ConsumerWidget {
+  final bool isDark;
+
+  const _GemmaSettingsTile({required this.isDark});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gemmaState = ref.watch(gemmaDownloadStatusProvider);
+    final ink = isDark ? Colors.white : kInk;
+
+    return GestureDetector(
+      onTap: () {
+        if (gemmaState.status == GemmaDownloadStatus.ready) {
+          ref.read(gemmaDownloadStatusProvider.notifier).deleteModel();
+        } else if (gemmaState.status == GemmaDownloadStatus.notDownloaded) {
+          ref.read(gemmaDownloadStatusProvider.notifier).startDownload();
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        child: Row(
+          children: [
+            Icon(
+              Icons.memory,
+              size: 18,
+              color: gemmaState.status == GemmaDownloadStatus.ready
+                  ? kNeonTeal
+                  : ink.withOpacity(0.4),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              'Gemma 4',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: ink.withOpacity(0.55),
+                  ),
+            ),
+            const Spacer(),
+            Text(
+              switch (gemmaState.status) {
+                GemmaDownloadStatus.notDownloaded => 'Not downloaded',
+                GemmaDownloadStatus.downloading => 'Downloading...',
+                GemmaDownloadStatus.ready => 'Ready (1.5 GB)',
+                GemmaDownloadStatus.error => 'Error',
+              },
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: gemmaState.status == GemmaDownloadStatus.ready
+                        ? kNeonTeal
+                        : ink,
+                  ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              gemmaState.status == GemmaDownloadStatus.ready
+                  ? Icons.delete_outline
+                  : Icons.download_outlined,
+              size: 16,
+              color: gemmaState.status == GemmaDownloadStatus.ready
+                  ? Colors.red[300]
+                  : ink.withOpacity(0.4),
             ),
           ],
         ),

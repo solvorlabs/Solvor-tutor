@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/database/daos/users_dao.dart';
+import '../../../../core/theme/design_tokens.dart';
 import '../test_provider.dart';
 import '../widgets/confidence_selector.dart';
 import '../widgets/question_card.dart';
@@ -76,7 +77,12 @@ class _TestScreenState extends ConsumerState<TestScreen>
     final conf = session.currentConfidence;
     final timeLimit = session.questions.length; // 1 min per q average
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) context.go('/home');
+      },
+      child: Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -140,17 +146,13 @@ class _TestScreenState extends ConsumerState<TestScreen>
               ),
             ),
           ),
-          Container(
+          Builder(builder: (context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+              color: isDark ? kSurface : Colors.white,
+              border: Border(top: BorderSide(color: isDark ? kSubtle : kBorder)),
             ),
             child: SafeArea(
               child: Row(
@@ -190,9 +192,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
                 ],
               ),
             ),
-          ),
+          );}),
         ],
       ),
-    );
+    ));
   }
 }

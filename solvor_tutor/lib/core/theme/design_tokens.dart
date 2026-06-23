@@ -215,3 +215,49 @@ class IsometricPainter extends CustomPainter {
       old.spacing != spacing ||
       old.strokeWidth != strokeWidth;
 }
+
+// ── Reusable isometric pattern strip for inner screen headers ───────────────
+class PatternBanner extends StatelessWidget {
+  final double height;
+
+  const PatternBanner({super.key, this.height = 52});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      height: height,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ClipRect(
+              child: CustomPaint(
+                painter: IsometricPainter(
+                  isDark: isDark,
+                  spacing: 20,
+                  strokeWidth: 1.0,
+                ),
+              ),
+            ),
+          ),
+          // fade to background on bottom so it blends into content
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    (isDark ? kVoid : kPaper).withOpacity(0.0),
+                    isDark ? kVoid : kPaper,
+                  ],
+                  stops: const [0.4, 1.0],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

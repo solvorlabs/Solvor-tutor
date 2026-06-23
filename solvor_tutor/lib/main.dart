@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
+import 'package:flutter_gemma_litertlm/flutter_gemma_litertlm.dart';
 
 import 'app.dart';
 import 'ai/search/offline_search.dart';
@@ -14,11 +16,18 @@ import 'sync/sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await FlutterGemma.initialize(
+    inferenceEngines: const [LiteRtLmEngine()],
+    maxDownloadRetries: 5,
+  );
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final db = AppDatabase(buildConnection());
   await _loadSeedDataIfNeeded(db);
 
-  final syncService = SyncService(db, baseUrl: 'http://10.0.2.2:3000');
+  final apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://solvor-backend.up.railway.app');
+  final syncService = SyncService(db, baseUrl: apiBase);
   syncService.start();
 
   runApp(

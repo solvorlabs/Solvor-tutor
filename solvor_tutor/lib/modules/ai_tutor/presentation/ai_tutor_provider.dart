@@ -36,12 +36,14 @@ final aiTutorSearchProvider =
   final language = user?.uiLanguage ?? 'en';
 
   final engine = ref.watch(offlineSearchEngineProvider);
+  final keywords = engine.getKeywords(query);
   final results = await engine.search(query, language: language);
 
   return AiTutorSearchState(
     intent: intent,
     results: results,
     language: language,
+    searchedKeywords: keywords,
   );
 });
 
@@ -49,11 +51,13 @@ class AiTutorSearchState {
   final IntentType intent;
   final List<SearchResult> results;
   final String language;
+  final List<String> searchedKeywords;
 
   const AiTutorSearchState({
     this.intent = IntentType.unknown,
     this.results = const [],
     this.language = 'en',
+    this.searchedKeywords = const [],
   });
 
   String get intentLabel {

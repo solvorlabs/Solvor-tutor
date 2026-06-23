@@ -34,7 +34,10 @@ class SpacedRepetitionDao extends DatabaseAccessor<AppDatabase>
     String userId,
     String questionId,
   ) async {
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final now = DateTime.now();
+    final todayStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final tomorrow = now.add(const Duration(days: 1));
     final tomorrowStr =
         '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
 
@@ -48,14 +51,15 @@ class SpacedRepetitionDao extends DatabaseAccessor<AppDatabase>
         mastered: const Value(false),
       ));
     } else {
+      // New items are due today so they appear immediately in the notebook
       await into(spacedRepetition).insert(SpacedRepetitionCompanion(
         id: Value(id),
         userId: Value(userId),
         questionId: Value(questionId),
         intervalDays: const Value(1),
-        nextReviewDate: Value(tomorrowStr),
+        nextReviewDate: Value(todayStr),
         mastered: const Value(false),
-        createdAt: Value(DateTime.now()),
+        createdAt: Value(now),
       ));
     }
   }

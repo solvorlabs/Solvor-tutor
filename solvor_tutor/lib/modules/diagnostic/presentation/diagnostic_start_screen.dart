@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/strings_provider.dart';
+import '../../../core/theme/design_tokens.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/questions_dao.dart';
 import '../../../core/database/daos/tests_dao.dart';
@@ -21,7 +22,10 @@ class DiagnosticStartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lang = ref.watch(langProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? kVoid : kPaper,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -29,54 +33,75 @@ class DiagnosticStartScreen extends ConsumerWidget {
         ),
         title: Text(AppStrings.get('diagnostic_title', lang)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const PatternBanner(),
+          Expanded(child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Spacer(flex: 2),
-            Icon(
-              Icons.assignment_outlined,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
+
+            // Icon / hero block
+            Container(
+              width: 72,
+              height: 72,
+              color: isDark ? kNeonYellow : kInk,
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.assignment_outlined,
+                size: 36,
+                color: isDark ? Colors.black : Colors.white,
+              ),
             ),
             const SizedBox(height: 24),
+
             Text(
               AppStrings.get('diagnostic_assessment', lang),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
                   ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               AppStrings.get('diagnostic_desc', lang),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
+                    color: isDark ? Colors.white54 : kMuted,
+                    height: 1.5,
                   ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
+
+            // Info rows
             _InfoRow(
               icon: Icons.quiz_outlined,
               label: AppStrings.get('diagnostic_questions', lang),
               value: '20',
+              isDark: isDark,
             ),
-            const SizedBox(height: 12),
+            Container(height: 1, color: isDark ? kSubtle : kBorder),
             _InfoRow(
               icon: Icons.timer_outlined,
               label: AppStrings.get('diagnostic_time_limit', lang),
-              value: '20 minutes',
+              value: '20 min',
+              isDark: isDark,
             ),
-            const SizedBox(height: 12),
+            Container(height: 1, color: isDark ? kSubtle : kBorder),
             _InfoRow(
               icon: Icons.category_outlined,
               label: AppStrings.get('diagnostic_subjects', lang),
-              value: 'Quant, Reasoning, English, GK',
+              value: 'Quant · Reasoning · English · GK',
+              isDark: isDark,
             ),
+
             const Spacer(flex: 2),
-            ElevatedButton(
-              onPressed: () async {
+
+            // CTA
+            GestureDetector(
+              onTap: () async {
                 final db = ref.read(databaseProvider);
                 final user = await UsersDao(db).getUser();
                 if (user == null) return;
@@ -87,14 +112,26 @@ class DiagnosticStartScreen extends ConsumerWidget {
                   context.go('/test/$testId');
                 }
               },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                color: isDark ? kNeonYellow : kInk,
+                alignment: Alignment.center,
+                child: Text(
+                  AppStrings.get('diagnostic_start', lang).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                    color: isDark ? Colors.black : Colors.white,
+                  ),
+                ),
               ),
-              child: Text(AppStrings.get('diagnostic_start', lang), style: const TextStyle(fontSize: 18)),
             ),
             const Spacer(),
           ],
         ),
+      )),
+        ],
       ),
     );
   }
@@ -104,37 +141,43 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final bool isDark;
 
   const _InfoRow({
     required this.icon,
     required this.label,
     required this.value,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 16),
-            Text(label, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                value,
-                textAlign: TextAlign.end,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 18,
+            color: isDark ? kNeonYellow : kMuted,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isDark ? Colors.white70 : kInk,
+                  ),
             ),
-          ],
-        ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : kInk,
+                ),
+          ),
+        ],
       ),
     );
   }

@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import '../../../../core/theme/design_tokens.dart';
 import '../onboarding_provider.dart';
 
-const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'http://192.168.1.100:3000');
+const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://solvor-backend.up.railway.app');
 
 class GoogleSignInScreen extends ConsumerStatefulWidget {
   const GoogleSignInScreen({super.key});
@@ -46,7 +46,7 @@ class _GoogleSignInScreenState extends ConsumerState<GoogleSignInScreen> {
           Uri.parse('$_apiBase/auth/firebase-login'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'idToken': idToken}),
-        );
+        ).timeout(const Duration(seconds: 5));
       } catch (_) {
       }
 

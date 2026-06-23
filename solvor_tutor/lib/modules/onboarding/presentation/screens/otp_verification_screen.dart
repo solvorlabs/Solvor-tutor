@@ -10,7 +10,7 @@ import '../../../../core/l10n/strings_provider.dart';
 import '../onboarding_provider.dart';
 import '../widgets/step_progress.dart';
 
-const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'http://192.168.1.100:3000');
+const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://solvor-backend.up.railway.app');
 
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   const OtpVerificationScreen({super.key});
@@ -64,7 +64,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           Uri.parse('$_apiBase/auth/firebase-login'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'idToken': idToken}),
-        );
+        ).timeout(const Duration(seconds: 5));
       } catch (_) {
         // Backend may not be running; Firebase auth is sufficient to proceed
       }
