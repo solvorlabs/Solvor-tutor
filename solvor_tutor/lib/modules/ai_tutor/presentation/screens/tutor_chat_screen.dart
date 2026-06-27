@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/theme/design_tokens.dart';
 import '../../../../core/mascot/mascot_widget.dart';
+import '../../../../modules/home/presentation/providers/home_provider.dart';
 import '../providers/chat_provider.dart';
 
 class TutorChatScreen extends ConsumerStatefulWidget {
@@ -36,12 +38,14 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
     });
   }
 
-  void _send() {
+  Future<void> _send() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     _controller.clear();
     ref.read(chatProvider.notifier).sendMessage(text);
     _scrollToBottom();
+    final prefs = await SharedPreferences.getInstance();
+    await markStudiedToday(prefs);
   }
 
   @override

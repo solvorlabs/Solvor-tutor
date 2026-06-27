@@ -35,6 +35,18 @@ class _MascotWidgetState extends State<MascotWidget>
   }
 
   @override
+  void didUpdateWidget(MascotWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.emotion != widget.emotion) {
+      _controller.stop();
+      _controller.duration = widget.emotion == MascotEmotion.celebrating
+          ? const Duration(milliseconds: 400)
+          : const Duration(milliseconds: 1800);
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -43,14 +55,6 @@ class _MascotWidgetState extends State<MascotWidget>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    if (widget.emotion == MascotEmotion.celebrating &&
-        _controller.duration != const Duration(milliseconds: 400)) {
-      _controller.duration = const Duration(milliseconds: 400);
-    } else if (widget.emotion != MascotEmotion.celebrating &&
-        _controller.duration != const Duration(milliseconds: 1800)) {
-      _controller.duration = const Duration(milliseconds: 1800);
-    }
 
     return AnimatedBuilder(
       animation: _bounce,

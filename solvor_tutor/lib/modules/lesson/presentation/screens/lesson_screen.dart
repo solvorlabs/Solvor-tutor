@@ -144,7 +144,7 @@ class _LessonContent extends StatelessWidget {
       case LessonStep.quiz3:
         final qIdx = state.currentStep.index - 2;
         if (qIdx >= lesson.questions.length) {
-          notifier.nextStep();
+          WidgetsBinding.instance.addPostFrameCallback((_) => notifier.nextStep());
           return const SizedBox.shrink();
         }
         final q = lesson.questions[qIdx];
