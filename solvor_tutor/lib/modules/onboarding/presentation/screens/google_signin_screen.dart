@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import '../../../../core/theme/design_tokens.dart';
 import '../onboarding_provider.dart';
 
-const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://solvor-tutor.onrender.com');
+const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://api.solvor.co.in');
 
 class GoogleSignInScreen extends ConsumerStatefulWidget {
   const GoogleSignInScreen({super.key});

@@ -492,7 +492,10 @@ class _GemmaSettingsTile extends ConsumerWidget {
                 GemmaDownloadStatus.notDownloaded => 'Not downloaded',
                 GemmaDownloadStatus.downloading => 'Downloading...',
                 GemmaDownloadStatus.ready => 'Ready (1.5 GB)',
-                GemmaDownloadStatus.error => 'Error',
+                GemmaDownloadStatus.error =>
+                  gemmaState.error != null && gemmaState.error!.length < 40
+                      ? gemmaState.error!
+                      : 'Error',
               },
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: gemmaState.status == GemmaDownloadStatus.ready

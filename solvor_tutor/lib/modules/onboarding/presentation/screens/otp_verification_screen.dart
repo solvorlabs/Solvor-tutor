@@ -10,7 +10,7 @@ import '../../../../core/l10n/strings_provider.dart';
 import '../onboarding_provider.dart';
 import '../widgets/step_progress.dart';
 
-const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://solvor-tutor.onrender.com');
+const _apiBase = String.fromEnvironment('API_BASE', defaultValue: 'https://api.solvor.co.in');
 
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   const OtpVerificationScreen({super.key});

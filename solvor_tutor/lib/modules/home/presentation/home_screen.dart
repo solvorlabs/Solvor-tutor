@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/strings_provider.dart';
 import '../../../core/theme/design_tokens.dart';
-import '../../../modules/error_notebook/presentation/error_notebook_provider.dart';
-import '../../../modules/onboarding/presentation/onboarding_provider.dart';
+import '../../../core/mascot/mascot_widget.dart';
+import '../../error_notebook/presentation/error_notebook_provider.dart';
+import '../../onboarding/presentation/onboarding_provider.dart';
+import 'providers/home_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,32 +21,38 @@ class HomeScreen extends ConsumerWidget {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.asData?.value;
 
-    final phone = user?.phoneNumber ?? '';
-    final displayId =
-        phone.length >= 4 ? phone.substring(phone.length - 4) : '----';
-    final exam = user?.selectedExam ?? 'SSC / BANKING';
+    final greetingAsync = ref.watch(homeGreetingProvider);
+    final streakAsync = ref.watch(streakProvider);
+    final progressAsync = ref.watch(dailyProgressProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final ink = isDark ? Colors.white : kInk;
     final lang = ref.watch(langProvider);
-    final border = isDark ? kSubtle : kBorder;
+
+    final exam = user?.selectedExam ?? 'SSC / BANKING';
+
+    String weakTopic = 'General Studies';
+    try {
+      final list = List<String>.from(
+          jsonDecode(user?.weakDomains ?? '[]') as List);
+      if (list.isNotEmpty) weakTopic = list.first;
+    } catch (_) {}
+
+    final streakData = streakAsync.asData?.value;
+    final progress = progressAsync.asData?.value;
 
     return Scaffold(
       backgroundColor: isDark ? kVoid : kPaper,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // ── Hero header — full-bleed isometric grid ──────────────────
             SliverToBoxAdapter(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final w = constraints.maxWidth;
-                  final bg = isDark ? kVoid : kPaper;
                   return SizedBox(
-                    height: 220,
+                    height: 200,
                     child: Stack(
                       children: [
-                        // Layer 1: isometric pattern fills entire header
                         Positioned.fill(
                           child: ClipRect(
                             child: CustomPaint(
@@ -55,132 +64,95 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-
-                        // Layer 2: gradient backing so text stays legible
-                        // solid on left → transparent on right
                         Positioned.fill(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  bg,
-                                  bg,
-                                  bg.withOpacity(0.0),
-                                ],
-                                stops: const [0.0, 0.58, 1.0],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
+                                colors: isDark
+                                    ? [
+                                        kVoid,
+                                        kVoid.withValues(alpha: 0.85),
+                                        kVoid.withValues(alpha: 0.0),
+                                      ]
+                                    : [
+                                        kPaper,
+                                        kPaper.withValues(alpha: 0.85),
+                                        kPaper.withValues(alpha: 0.0),
+                                      ],
                               ),
                             ),
                           ),
                         ),
-
-                        // Layer 3: brand text anchored bottom-left
                         Positioned(
                           left: 20,
-                          bottom: 28,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                AppStrings.get('home_title', lang),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayMedium
-                                    ?.copyWith(letterSpacing: -2, height: 0.9),
+                              MascotWidget(
+                                emotion: streakData?.studiedToday == true
+                                    ? MascotEmotion.happy
+                                    : MascotEmotion.greeting,
+                                size: 90,
                               ),
-                              NeonText(
-                                AppStrings.get('home_subtitle', lang),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayMedium
-                                    ?.copyWith(
-                                      letterSpacing: -2,
-                                      height: 0.9,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                              ),
-                              const SizedBox(height: 16),
-                              GestureDetector(
-                                 onTap: () => context.push('/settings'),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: border),
-                                    color: isDark ? kSurface : Colors.white,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.military_tech_outlined,
-                                          size: 13,
-                                          color: ink.withOpacity(0.5)),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        exam.toUpperCase(),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall
-                                            ?.copyWith(
-                                              color: ink,
-                                              letterSpacing: 1.5,
-                                            ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    greetingAsync.when(
+                                      data: (g) => Text(
+                                        g,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: ink,
+                                          height: 1.35,
+                                        ),
                                       ),
-                                    ],
-                                  ),
+                                      loading: () => Text(
+                                        'Namaste!',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: ink),
+                                      ),
+                                      error: (_, __) => const SizedBox.shrink(),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (streakData != null &&
+                                        streakData.currentStreak > 0)
+                                      _StreakBadge(
+                                          streak: streakData.currentStreak,
+                                          isDark: isDark),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-
-                        // Layer 4: profile badge floating top-right over pattern
                         Positioned(
+                          top: 16,
                           right: 16,
-                          top: 20,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                 onTap: () => context.push('/settings'),
-                                child: Container(
-                                  width: 46,
-                                  height: 46,
-                                  decoration: BoxDecoration(
-                                    // opaque backing so it reads over the pattern
-                                    color: isDark ? kVoid : kPaper,
-                                    border: Border.all(
-                                      color: isDark ? kNeonTeal : kInk,
-                                      width: isDark ? 1.5 : 1.5,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      displayId,
-                                      style: TextStyle(
-                                        color: isDark ? kNeonTeal : kInk,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 11,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            color:
+                                isDark ? kNeonPurple.withValues(alpha: 0.2) : kInk.withValues(alpha: 0.07),
+                            child: Text(
+                              exam.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                                color: isDark ? kNeonPurple : kMuted,
                               ),
-                              const SizedBox(height: 8),
-                              GestureDetector(
-                                 onTap: () => context.push('/settings'),
-                                child: Icon(
-                                  Icons.settings_outlined,
-                                  color: isDark
-                                      ? kNeonTeal.withOpacity(0.8)
-                                      : kInk.withOpacity(0.5),
-                                  size: 20,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
@@ -190,57 +162,222 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
 
-            // ── Gradient divider ─────────────────────────────────────────
-            const SliverToBoxAdapter(child: GradientDivider(height: 3)),
+            if (progress != null)
+              SliverToBoxAdapter(
+                child: _DailyPlanCard(progress: progress, isDark: isDark),
+              ),
 
-            // ── Section label ─────────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-                child: Text(
-                  AppStrings.get('home_modules_label', lang),
-                  style: Theme.of(context).textTheme.labelSmall,
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ABHI KAREIN',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.4,
+                        color: isDark ? kNeonTeal : kMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _QuickCard(
+                            label: 'Aaj ka Topic',
+                            sublabel: weakTopic,
+                            icon: Icons.auto_stories_outlined,
+                            accentColor: kNeonTeal,
+                            isDark: isDark,
+                            onTap: () => context.push('/lesson/$weakTopic'),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _QuickCard(
+                            label: 'AI Tutor',
+                            sublabel: 'Solvy se baat karo',
+                            icon: Icons.chat_bubble_outline,
+                            accentColor: kNeonPurple,
+                            isDark: isDark,
+                            onTap: () => context.push('/tutor-chat'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
 
-            // ── Editorial module cards ────────────────────────────────────
-            SliverList(
-              delegate: SliverChildListDelegate([
-                _EditorialCard(
-                  category: 'ASSESSMENT',
-                  title: AppStrings.get('home_diagnostic', lang),
-                  subtitle: AppStrings.get('home_diagnostic_sub', lang),
-                  accentColor: kNeonYellow,
-                  onTap: () => context.push('/diagnostic'),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Text(
+                  'PRACTICE',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.4,
+                    color: isDark ? kNeonYellow : kMuted,
+                  ),
                 ),
-                _EditorialCard(
-                  category: 'PRACTICE',
-                  title: AppStrings.get('home_practice', lang),
-                  subtitle: AppStrings.get('home_practice_sub', lang),
-                  accentColor: kNeonPurple,
-                  onTap: () => context.push('/diagnostic'),
-                ),
-                _EditorialCard(
-                  category: 'REVIEW',
-                  title: AppStrings.get('home_notebook', lang),
-                  subtitle: AppStrings.homeNotebookSub(dueCount, lang),
-                  badge: dueCount > 0 ? '$dueCount DUE' : null,
-                  accentColor: kNeonTeal,
-                  onTap: () => context.push('/error-notebook'),
-                ),
-                _EditorialCard(
-                  category: 'ON-DEVICE AI',
-                  title: AppStrings.get('home_ai_tutor', lang),
-                  subtitle: AppStrings.get('home_ai_tutor_sub', lang),
-                  accentColor: kNeonYellow,
-                  onTap: () => context.push('/ai-tutor'),
-                  isLast: true,
-                ),
-              ]),
+              ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1.6,
+                ),
+                delegate: SliverChildListDelegate([
+                  _FeatureCard(
+                    label: AppStrings.get('home_diagnostic', lang),
+                    icon: Icons.biotech_outlined,
+                    accent: kNeonYellow,
+                    isDark: isDark,
+                    onTap: () => context.push('/diagnostic'),
+                  ),
+                  _FeatureCard(
+                    label: AppStrings.get('home_practice', lang),
+                    icon: Icons.quiz_outlined,
+                    accent: kNeonTeal,
+                    isDark: isDark,
+                    onTap: () => context.push('/test/quick'),
+                  ),
+                  _FeatureCard(
+                    label: AppStrings.get('home_error_notebook', lang),
+                    icon: Icons.book_outlined,
+                    accent: kNeonPurple,
+                    badge: dueCount > 0 ? '$dueCount due' : null,
+                    isDark: isDark,
+                    onTap: () => context.push('/error-notebook'),
+                  ),
+                  _FeatureCard(
+                    label: AppStrings.get('home_review', lang),
+                    icon: Icons.history_outlined,
+                    accent: kNeonYellow,
+                    isDark: isDark,
+                    onTap: () => context.push('/review/latest'),
+                  ),
+                ]),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () => context.push('/settings'),
+        backgroundColor: isDark ? kSurface : kBorder,
+        child: Icon(Icons.settings_outlined, color: isDark ? Colors.white54 : kMuted, size: 18),
+      ),
+    );
+  }
+}
+
+class _StreakBadge extends StatelessWidget {
+  final int streak;
+  final bool isDark;
+  const _StreakBadge({required this.streak, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? kNeonYellow.withValues(alpha: 0.15) : kInk.withValues(alpha: 0.08),
+        border: Border.all(
+          color: isDark ? kNeonYellow.withValues(alpha: 0.4) : kInk.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.local_fire_department,
+              size: 14, color: isDark ? kNeonYellow : kInk),
+          const SizedBox(width: 5),
+          Text(
+            '$streak day streak',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: isDark ? kNeonYellow : kInk,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailyPlanCard extends StatelessWidget {
+  final DailyProgress progress;
+  final bool isDark;
+  const _DailyPlanCard({required this.progress, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? kSurface : Colors.white,
+          border: Border(
+            left: BorderSide(color: kNeonTeal, width: 3),
+            top: BorderSide(color: isDark ? kSubtle : kBorder),
+            right: BorderSide(color: isDark ? kSubtle : kBorder),
+            bottom: BorderSide(color: isDark ? kSubtle : kBorder),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'AAJ KA PLAN',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.4,
+                    color: isDark ? kNeonTeal : kMuted,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  progress.isComplete
+                      ? 'Complete! 🎉'
+                      : '${progress.questionsAnswered} / ${progress.dailyGoal} questions',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white70 : kInk,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRect(
+              child: Container(
+                height: 6,
+                color: isDark ? kSubtle : kBorder,
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: progress.fraction,
+                  child: Container(
+                    color: progress.isComplete ? kNeonYellow : kNeonTeal,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -248,148 +385,132 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _EditorialCard extends StatelessWidget {
-  final String category;
-  final String title;
-  final String subtitle;
-  final String? badge;
+class _QuickCard extends StatelessWidget {
+  final String label;
+  final String sublabel;
+  final IconData icon;
   final Color accentColor;
+  final bool isDark;
   final VoidCallback onTap;
-  final bool isLast;
-  final bool disabled;
 
-  const _EditorialCard({
-    required this.category,
-    required this.title,
-    required this.subtitle,
+  const _QuickCard({
+    required this.label,
+    required this.sublabel,
+    required this.icon,
     required this.accentColor,
+    required this.isDark,
     required this.onTap,
-    this.badge,
-    this.isLast = false,
-    this.disabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final ink = isDark ? Colors.white : kInk;
-    final border = isDark ? kSubtle : kBorder;
-
-    final card = Container(
-      decoration: BoxDecoration(
-        // Dark: pure void so neon accent bar pops; Light: white
-        color: isDark ? kVoid : Colors.white,
-        border: Border(
-          top: BorderSide(color: border),
-          bottom: isLast ? BorderSide(color: border) : BorderSide.none,
-        ),
-      ),
-      padding: EdgeInsets.fromLTRB(isDark ? 23 : 20, 20, 20, 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      category,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            // Dark: neon accent color for eyebrow; Light: muted
-                            color: isDark
-                                ? accentColor.withOpacity(0.9)
-                                : ink.withOpacity(0.4),
-                          ),
-                    ),
-                    if (badge != null) ...[
-                      const SizedBox(width: 8),
-                      _NeonBadge(badge!, accentColor),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 4),
-                Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Padding(
-            padding: const EdgeInsets.only(top: 22),
-            child: Icon(
-              Icons.arrow_forward,
-              size: 18,
-              color: isDark
-                  ? accentColor.withOpacity(disabled ? 0.3 : 0.7)
-                  : ink.withOpacity(disabled ? 0.3 : 0.6),
-            ),
-          ),
-        ],
-      ),
-    );
-
     return GestureDetector(
-      onTap: disabled ? null : onTap,
-      child: Opacity(
-        opacity: disabled ? 0.45 : 1.0,
-        child: isDark
-            ? Stack(
-                children: [
-                  card,
-                  // 3px neon accent on left edge (dark only)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Container(width: 3, color: accentColor),
-                  ),
-                ],
-              )
-            : card,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? kSurface : Colors.white,
+          border: Border(
+            left: BorderSide(color: accentColor, width: 3),
+            top: BorderSide(color: isDark ? kSubtle : kBorder),
+            right: BorderSide(color: isDark ? kSubtle : kBorder),
+            bottom: BorderSide(color: isDark ? kSubtle : kBorder),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: accentColor, size: 20),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : kInk,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              sublabel,
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark ? Colors.white38 : kMuted,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _NeonBadge extends StatelessWidget {
+class _FeatureCard extends StatelessWidget {
   final String label;
-  final Color accentColor;
+  final IconData icon;
+  final Color accent;
+  final bool isDark;
+  final String? badge;
+  final VoidCallback onTap;
 
-  const _NeonBadge(this.label, this.accentColor);
+  const _FeatureCard({
+    required this.label,
+    required this.icon,
+    required this.accent,
+    required this.isDark,
+    required this.onTap,
+    this.badge,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    if (isDark) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        color: accentColor,
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? kSurface : Colors.white,
+          border: Border.all(color: isDark ? kSubtle : kBorder),
         ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      color: kInk,
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: kPaper,
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.8,
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: accent, size: 22),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : kInk,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            if (badge != null)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  color: accent,
+                  child: Text(
+                    badge!,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
