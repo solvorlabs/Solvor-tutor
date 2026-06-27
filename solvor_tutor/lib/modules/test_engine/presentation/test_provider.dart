@@ -179,7 +179,7 @@ final testSessionUseCaseProvider = Provider<TestSessionUseCase>((ref) {
 });
 
 final testProvider =
-    StateNotifierProvider.autoDispose.family<TestNotifier, TestState, String>(
+    StateNotifierProvider.family<TestNotifier, TestState, String>(
   (ref, testId) {
     final useCase = ref.watch(testSessionUseCaseProvider);
     final usersDao = UsersDao(ref.watch(databaseProvider));

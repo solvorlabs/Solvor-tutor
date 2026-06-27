@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/database/daos/users_dao.dart';
 import '../../../../core/theme/design_tokens.dart';
+import '../../../../modules/home/presentation/providers/home_provider.dart';
 import '../test_provider.dart';
 import '../widgets/confidence_selector.dart';
 import '../widgets/question_card.dart';
@@ -171,11 +173,17 @@ class _TestScreenState extends ConsumerState<TestScreen>
                       onPressed: (answer != null && conf != null)
                           ? () async {
                               if (session.isLastQuestion) {
+                                final prefs = await SharedPreferences.getInstance();
+                                await markStudiedToday(prefs);
+                                await incrementDailyQuestions(prefs);
                                 final testId = await notifier.submitTest();
                                 if (context.mounted) {
                                   context.go('/debrief/$testId');
                                 }
                               } else {
+                                final prefs = await SharedPreferences.getInstance();
+                                await markStudiedToday(prefs);
+                                await incrementDailyQuestions(prefs);
                                 await notifier.submitCurrentAnswer();
                                 notifier.goToNextQuestion();
                                 setState(() {
